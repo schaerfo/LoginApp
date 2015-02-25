@@ -1,10 +1,8 @@
 package com.gmail.jakobmache.login;
 
-import android.content.Intent;
-import android.net.Uri;
+import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -13,18 +11,8 @@ import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.EditText;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
-
 public class MainActivity extends ActionBarActivity {
 
-    private static final String PLAN_URL = "http://asgspez.de/index.php/schueler-intern/vertretungsplan.html";
-    private static final String SIGN_IN_URL = "http://asgspez.de/index.php/anmelden.html";
     private final String TAG = getClass().getSimpleName();
     private String name;
     private String password;
@@ -47,15 +35,10 @@ public class MainActivity extends ActionBarActivity {
                 LoginHelper helper = new LoginHelper();
 
                 try {
-                    String result = "";
-                    result = helper.openConnectionAndLogIn(name, password);
-                    URL url = new URL(PLAN_URL);
-                    HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-                    // result = readStream(in);
-                    urlConnection.disconnect();
+                    helper.login(name, password);
+                    String result = helper.fetchPlan();
                     view.loadData(result, "text/html", "UTF-8");
-                    }
+                }
                 catch (Exception e)
                 {
                     Log.e(TAG,"exception", e);
@@ -73,36 +56,9 @@ public class MainActivity extends ActionBarActivity {
         EditText userInput = (EditText) findViewById(R.id.nameInput);
         EditText passwordInput = (EditText) findViewById(R.id.passwordInput);
 
-        name = (String) userInput.getText().toString();
-        password = (String) passwordInput.getText().toString();
+        name = userInput.getText().toString();
+        password = passwordInput.getText().toString();
     }
-
-    private static String readStream(InputStream is)
-    {
-        String result;
-        try
-        {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            String line = "";
-            StringBuilder stringBuilder = new StringBuilder();
-
-            while ((line = reader.readLine()) != null)
-            {
-                stringBuilder.append(line);
-            }
-
-            result = stringBuilder.toString();
-        }
-
-        catch (Exception e)
-        {
-            result = "";
-        }
-
-        return result;
-    }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
